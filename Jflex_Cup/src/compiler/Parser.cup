@@ -1,0 +1,101 @@
+// ------------  Paquete e importaciones ------------
+package compiler;
+
+import java_cup.runtime.*;
+import java.util.LinkedList;
+
+
+//------> Codigo para el parser
+parser code
+{:
+ public String resultado = "";
+
+    public void syntax_error(Symbol s)
+    {
+            main.Main.listaErrores.add(new utils.ErrorClass("Sintáctico", (String) s.value, s.right, s.left ));
+            System.err.println("Error Sintactico: "+ s.value + " - Fila: " + s.right + " - Columna: " + s.left + ". Recuperado" );
+    }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {
+            main.Main.listaErrores.add(new utils.ErrorClass("Sintáctico", (String) s.value, s.right, s.left ));
+            System.err.println("Error Sintactico: "+ s.value + " - Fila: " + s.right + " - Columna: " + s.left + ". Sin recuperacion." );
+    }
+:}
+//------> Codigo para las acciones gramaticales (no tocar)
+action code
+{::};
+
+
+//------> Declaración de terminales
+
+terminal String PTCOMA;
+terminal String MAS;
+terminal String POR;
+terminal String MENOS;
+terminal String DIVIDO;
+terminal String FIN;
+terminal String PROGRAM;
+terminal String CC;
+terminal String CA;
+terminal String LLA;
+terminal String LLC;
+terminal String OPERACION;
+terminal String ENTERO;
+terminal String IGUAL;
+terminal String LET;
+terminal String ID;
+terminal String INT;
+
+
+
+//------> Declaración de no terminales
+non terminal Object inicio;
+non terminal Object  instrucciones;
+non terminal Object  instruccion;
+non terminal Object  expresion;
+
+//------> PRECEDENCIA
+precedence left MAS,MENOS;
+precedence left POR,DIVIDO;
+
+//------> Definir Simbolo Inicial
+start with inicio;
+
+// ------------>  Producciones  <------------
+
+inicio ::=  PROGRAM LLA instrucciones LLC FIN ;
+
+instrucciones ::= instruccion
+    |  instrucciones instruccion
+    ;
+
+
+instruccion ::= OPERACION CA expresion:a  CC PTCOMA
+              {:System.out.println("El resultado de la operación es : " + a );:}
+              | LET:reservada INT:tipo ID:var IGUAL expresion:val PTCOMA {:
+              main.Main.tablaSimbolos.put(var.toString(),
+                            new utils.Variable(var.toString(), "variable " +  tipo.toString(), val.toString(), reservadaright,reservadaleft));
+              :}
+                VERAUTOMATAS ( ID) ;
+              | error PTCOMA
+
+;
+
+expresion ::= expresion:a MAS expresion:b   {:  RESULT = utils.Expresion.Suma(a.toString(),b.toString()); :}
+             | expresion:a MENOS expresion:b  {:  RESULT = utils.Expresion.Resta(a.toString(),b.toString()); :}
+             | expresion:a POR expresion:b   {:  RESULT = utils.Expresion.Multiplicacion(a.toString(),b.toString()); :}
+             | expresion:a DIVIDO expresion:b  {:  RESULT = utils.Expresion.Division(a.toString(),b.toString()); :}
+             | ID:val                          {: utils.Variable variable = main.Main.tablaSimbolos.get(val.toString());
+                                                    if (variable != null)
+                                                    {
+                                                    RESULT = variable.getCadena();
+                                                    };
+                                                    :}
+
+             | ENTERO:a                      {: RESULT = a.toString();:}
+             ;
+
+
+
+
