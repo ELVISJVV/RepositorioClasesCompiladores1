@@ -1,0 +1,44 @@
+package compiler;
+
+import java_cup.runtime.*;
+import utils.RegistroAutomatas;
+
+parser code
+{:
+
+    public void syntax_error(Symbol s)
+    {
+
+            System.err.println("Error Sintactico: "+ s.value + " - Fila: " + s.right + " - Columna: " + s.left + ". Recuperado" );
+    }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {
+
+            System.err.println("Error Sintactico: "+ s.value + " - Fila: " + s.right + " - Columna: " + s.left + ". Sin recuperacion." );
+    }
+
+:}
+
+//------> Codigo para las acciones gramaticales (no tocar)
+action code
+{:  :}
+
+
+
+terminal PA, PC, PTCOMA;
+terminal String ID;
+terminal String CADENA;
+
+non terminal programa, llamada;
+
+start with programa;
+
+programa ::= llamada
+           ;
+
+llamada ::= ID:nombre PA CADENA:val PC PTCOMA
+           {:
+              RegistroAutomatas.validar(nombre, val);
+           :}
+         ;
