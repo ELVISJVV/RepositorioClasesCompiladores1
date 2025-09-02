@@ -1,0 +1,15 @@
+digraph AFD_1 {
+rankdir=LR;
+node [shape=circle];
+  _ini [shape=point,label=""];
+ _ini -> "S";
+  "B" [shape=doublecircle];
+  "C" [shape=doublecircle];
+  "S" -> "A" [label="1"];
+  "S" -> "B" [label="0"];
+  "A" -> "A" [label="1"];
+  "A" -> "B" [label="0"];
+  "B" -> "C" [label="0"];
+  "B" -> "A" [label="1"];
+  "C" -> "A" [label="1"];
+}
